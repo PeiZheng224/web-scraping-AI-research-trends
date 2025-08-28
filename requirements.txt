@@ -1,0 +1,25 @@
+# Web Scraping Mini-Project Dependencies
+# COMPSS 211
+
+# Web Scraping
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.2
+
+# Data Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.18.0
+
+# Jupyter Notebook Support
+jupyter==1.0.0
+notebook==7.0.6
+ipykernel==6.27.1
+
+# Additional Utilities
+python-dotenv==1.0.0  # For environment variables
+tqdm==4.66.1  # Progress bars

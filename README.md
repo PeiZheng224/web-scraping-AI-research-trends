@@ -1,126 +1,97 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/iq15X70c)
-# HW 4: Web Scraping Mini-Project
+# Web Scraping Mini-Project — arXiv "AI" Research Trends
 
-## Assignment Overview
+**Author:** Pei Zheng · UC Berkeley · **Date:** October 2025
 
-In this assignment, you will practice web scraping skills by collecting data from a website of your choice, saving it in a structured format, and performing basic analysis on the collected data. This project will demonstrate your ability to:
+A web scraper and analysis pipeline that collects recent AI-related research papers from [arXiv](https://arxiv.org/search/) and explores trends in topics, research categories, and author collaboration.
 
-1. Navigate website structure and extract relevant data
-2. Handle web scraping ethically and responsibly
-3. Clean and structure scraped data
-4. Perform basic data analysis and visualization
-5. Document your process clearly
+## Overview
 
-## Assignment Requirements
+This project scrapes the arXiv search results for the keyword **"AI"** (no API — direct HTML parsing), saves the records to CSV, and analyzes them in a Jupyter notebook. It covers the full pipeline: ethical scraping, data cleaning, exploratory analysis, and visualization.
 
-### Core Tasks (Required)
-
-1. **Choose a Website to Scrape**
-   - Select from our suggested sites (see `example_sites.md`) OR
-   - Choose your own site (must be approved - check robots.txt first!)
-   
-2. **Collect Data**
-   - Scrape at least 50 items/records
-   - Extract at least 3 different data fields per item
-   - Handle errors gracefully (timeouts, missing data, etc.)
-
-3. **Save Your Data**
-   - Save as CSV or JSON format in the `data/` folder
-   - Include a timestamp in your filename
-   - Create a data dictionary explaining each field
-
-4. **Analyze Your Data**
-   - Compute basic statistics (mean, median, counts, etc.)
-   - Create at least 2 visualizations
-   - Write 2-3 paragraphs interpreting your findings
-
-5. **Document Your Process**
-   - Comment your code thoroughly
-   - Explain your scraping strategy
-   - Note any challenges and how you solved them
-   - Cite the website and respect their terms of service
-
-### Ethical Considerations
-
-- **ALWAYS** check and respect robots.txt
-- Add delays between requests (at least 1 second)
-- Include a descriptive User-Agent header
-- Do not overwhelm the server with requests
-- Respect the website's terms of service
-- Give proper attribution to data sources
+- **Data source:** `https://arxiv.org/search/` (HTML scraping with BeautifulSoup)
+- **Records collected:** 60 papers
+- **Fields per record:** `title`, `authors`, `abstract`, `categories`, `submission_date`
+- **Goal:** Surface patterns in recent arXiv publications tagged "AI"
 
 ## Repository Structure
 
 ```
-web-scraping-mini-project/
-├── README.md                 # This file
-├── requirements.txt          # Python dependencies
-├── example_sites.md         # Suggested websites to scrape
-├── starter_code.py         # Template code to get you started
-├── analysis_template.ipynb # Jupyter notebook template
-├── scraper.py              # YOUR scraping code goes here
-├── analysis.ipynb          # YOUR analysis goes here
-├── data/                   # Folder for scraped data
-│   └── .gitkeep
-└── outputs/                # Folder for visualizations
-    └── .gitkeep
+hw4-web-scraping-mini-project/
+├── README.md                    # This file
+├── requirements.txt             # Python dependencies
+├── scraper.py                   # arXiv HTML scraper (pagination + per-paper enrichment)
+├── analysis.ipynb               # Full analysis: cleaning, EDA, visualizations, findings
+├── data/
+│   ├── arxiv_AI_20251026.csv    # Raw scraped data (60 records, timestamped)
+│   └── cleaned_data.csv         # Cleaned dataset
+└── starter_code.py              # Original assignment template
 ```
 
-## Getting Started
+## How It Works
 
-1. **Clone this repository** through GitHub Classroom
+### 1. Scraping (`scraper.py`)
 
-2. **Set up your environment:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+The scraper extracts each result block from the arXiv search page (title, authors, abstract). Because the search page does not reliably expose categories and submission dates, the scraper also visits each paper's `/abs/` detail page to enrich those fields. It paginates through multiple result pages until the target record count is reached.
 
-3. **Review the starter files:**
-   - Look at `starter_code.py` for a scraping template
-   - Check `example_sites.md` for website suggestions
-   - Review `analysis_template.ipynb` for analysis structure
+Ethical scraping practices built in:
 
-4. **Start coding:**
-   - Copy `starter_code.py` to `scraper.py` and modify it
-   - Copy `analysis_template.ipynb` to `analysis.ipynb` for your analysis
+- Checks `robots.txt` and sends a descriptive `User-Agent` identifying the author
+- Applies a **1.2-second delay** between requests
+- Handles errors gracefully (timeouts, missing fields)
+- Collects only public metadata for research/educational use
 
-## Submission Requirements
+### 2. Analysis (`analysis.ipynb`)
 
-Your submission should include:
+The notebook loads the scraped CSV, cleans it (drops duplicate titles, normalizes text), then runs exploratory analysis and produces three visualizations.
 
-1. **Code Files:**
-   - `scraper.py` - Your web scraping code
-   - `analysis.ipynb` - Your data analysis notebook
+## Key Findings
 
-2. **Data Files:**
-   - Your scraped data in `data/` folder (CSV or JSON)
+1. **Title themes:** The most frequent title words are *models, learning, language, text, based* — pointing to a heavy focus on large language models, NLP, and text-based ML systems.
+2. **Research categories:** The dominant categories are Artificial Intelligence (cs.AI), Machine Learning (cs.LG), and Computation and Language (cs.CL), reflecting strong overlap between AI, ML, and LLM research.
+3. **Collaboration size:** Most papers have 3–6 authors, with a few large 10+ author collaborations — suggesting compact, often cross-institutional research teams rather than large consortia.
 
-3. **Output Files:**
-   - At least 2 visualizations in `outputs/` folder
-   - Brief written analysis (in the notebook)
+## Visualizations
 
-4. **Documentation:**
-   - Well-commented code
-   - Clear explanation of your process
-   - Any assumptions or limitations noted
+The notebook produces:
 
-## Tips for Success
+1. A word cloud of the most frequent words in paper titles
+2. A bar chart of the top 10 research categories
+3. A distribution of author counts per paper
 
-1. **Start Simple:** Begin with a basic scraper and gradually add features
-2. **Test Often:** Scrape a few items first before attempting the full dataset
-3. **Handle Errors:** Use try-except blocks for robust code
-4. **Be Patient:** Add delays and be respectful of the website
-5. **Document Everything:** Your future self will thank you
+## Data Dictionary
 
-## Need Help?
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| `title` | string | Paper title | "Real Deep Research for AI, Robotics and Beyond" |
+| `authors` | string | Authors, `;`-separated | Anna Mészáros; Patrik Reizinger; Ferenc Huszár |
+| `abstract` | string | Abstract text | "With the rapid growth of research in AI and robotics…" |
+| `categories` | string | arXiv subject categories | Computation and Language (cs.CL); Artificial Intelligence (cs.AI) |
+| `submission_date` | date | Submission date | 23 Oct 2025 |
 
-- Review the Week 7 lecture materials on web scraping
-- Use your AI coding journal to document any LLM assistance
-- Post questions in the course forum
-- Attend office hours
+## Technical Challenges
 
-## Deadline
+- **Pagination:** The initial scraper only read the first results page and fell short of 60 records. Solved by adding automatic pagination across result pages.
+- **Missing metadata:** Categories and submission dates were empty when read from the search page alone. Solved by visiting each paper's `/abs/` page to extract those fields directly from the article metadata.
 
-This assignment is due **one week from assignment date** via GitHub Classroom.
+## Setup & Usage
 
-Good luck with your web scraping project!
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the scraper (produces a timestamped CSV in data/)
+python scraper.py
+
+# Open the analysis notebook
+jupyter notebook analysis.ipynb
+```
+
+## Limitations & Future Work
+
+The dataset covers only 60 papers from a single snapshot, so it is not enough to generalize broad trends. A larger, longitudinal dataset spanning multiple months or years would enable time-series analysis of topic evolution and collaboration networks. Future work could add metadata such as citation counts, institutional affiliations, and geography to reveal deeper patterns in global AI research.
+
+## References
+
+- Data source: https://arxiv.org/search/
+- Date of collection: October 26, 2025
+- Built with `requests`, `beautifulsoup4`, `pandas`, `matplotlib`, `seaborn`, and `wordcloud`
